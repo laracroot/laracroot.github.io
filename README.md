@@ -16,8 +16,12 @@ Prasyarat:
    ![image](https://github.com/user-attachments/assets/5c59f00b-74ff-4706-8f0a-ae6a6f421d3c)  
    ![image](https://github.com/user-attachments/assets/549a53ec-8f01-4833-a65f-bdf5cfa288ad)  
 
-4. Pindahkan file composer.phar ke direktori php
-3. 
+4. Pindahkan file composer.phar ke direktori php kemudian buat file composer.bat yang berisi:
+   ```bat
+   @echo off
+   php "%~dp0composer.phar" %*
+   ```
+5. Install laravel 
 ## Instalasi
 
 
