@@ -1,4 +1,4 @@
-# laracroot.github.io
+# Laravel Core Root | Laravel Only Without Third Party
 Laravel Core Root
 Prasyarat:
 1. Dwonload zip [PHP](https://www.php.net/downloads.php) versi NTS, kemudian ekstrak dan rename folder nya menjadi php. Kemudian masukkan ke dalam path dan cek menggunakan cmd.
