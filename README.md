@@ -9,6 +9,7 @@ Prasyarat:
    ![image](https://github.com/user-attachments/assets/6c1dcc3c-99a8-4c72-a2b4-d82b9b13755b)  
 2. Copy php.ini-development menjadi php.ini kemudian buka ekstensi openssl
    ```conf
+   extension_dir = "ext"
    extension=openssl
    ```
 4. Install [Composer](https://getcomposer.org/download/)
