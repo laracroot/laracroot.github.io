@@ -63,7 +63,7 @@ Prasyarat:
       class Category extends Model
       {
           use HasFactory;
-          protected $fillable = ['name', 'is_publish'];
+          protected $fillable = ['name', 'is_publish'];//opsional bisa di tambahkan baris ini
       }
      ```
      $fillable: Properti ini menentukan kolom mana yang bisa diisi secara massal. Anda bisa menambah atau mengurangi kolom yang diizinkan sesuai kebutuhan.
