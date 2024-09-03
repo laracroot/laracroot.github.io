@@ -141,7 +141,7 @@ class CategoryFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    protected $model = Category::class;
+    protected $model = Category::class;//opsional tambahan baris ini lihat di model jika disana ada maka tambahkan ini
 
     public function definition(): array
     {
