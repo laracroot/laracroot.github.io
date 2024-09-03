@@ -12,8 +12,10 @@ Prasyarat:
    extension_dir = "ext"
    extension=openssl
    ```
-4. Install [Composer](https://getcomposer.org/download/)
-   ![image](https://github.com/user-attachments/assets/5c59f00b-74ff-4706-8f0a-ae6a6f421d3c)
+3. Install [Composer](https://getcomposer.org/download/)
+   ![image](https://github.com/user-attachments/assets/5c59f00b-74ff-4706-8f0a-ae6a6f421d3c)  
+   ![image](https://github.com/user-attachments/assets/549a53ec-8f01-4833-a65f-bdf5cfa288ad)  
+
 2. Install php 
 ## Instalasi
 
