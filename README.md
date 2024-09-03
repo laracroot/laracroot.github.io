@@ -475,8 +475,13 @@ Setelah rute diatur, Anda bisa mengakses berbagai endpoint untuk mengelola pengg
 
 `UserController` ini menyediakan semua metode CRUD dasar yang Anda butuhkan untuk mengelola pengguna dalam aplikasi Laravel Anda. Dengan menghubungkan controller ini dengan rute yang sesuai, Anda bisa membangun API yang kuat untuk mengelola pengguna.
 
-## Catatan tambahan
-1. [Membuat model dan migrasi](01.%20Model%20dan%20Migrasi/)
-2. [Factory dan Seeder](02.%20Factory%20dan%20Seeder/)
-3. Membangun Fungsi CRUD
-4. API
+## Deploy
+
+Pastikan sudah melakukan instalasi CORS
+```sh
+php artisan config:publish cors
+```
+
+Kemudian edit `config/cors.php`
+
+
