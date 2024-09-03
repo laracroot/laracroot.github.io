@@ -51,6 +51,22 @@ Prasyarat:
      ```bash
      php artisan make:model Category -m
      ```
+     maka akan menghasilkan file Model: app/Models/Category.php
+     ```php
+     <?php
+
+      namespace App\Models;
+      
+      use Illuminate\Database\Eloquent\Factories\HasFactory;
+      use Illuminate\Database\Eloquent\Model;
+      
+      class Category extends Model
+      {
+          use HasFactory;
+          protected $fillable = ['name', 'is_publish'];
+      }
+     ```
+     $fillable: Properti ini menentukan kolom mana yang bisa diisi secara massal. Anda bisa menambah atau mengurangi kolom yang diizinkan sesuai kebutuhan.
    - Buka file migration di `database/migrations/` dan tambahkan kolom yang diperlukan, contoh:
      ```php
      <?php
@@ -86,6 +102,7 @@ Prasyarat:
      ```bash
      php artisan migrate
      ```
+   Dengan langkah-langkah ini, Anda telah berhasil membuat model Category dan migration yang sesuai. Model ini siap digunakan untuk berinteraksi dengan tabel categories di database.
 
 
 ## Catatan tambahan
