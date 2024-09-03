@@ -34,6 +34,8 @@ Prasyarat:
    composer create-project --prefer-dist laravel/laravel laracroot
    ```
 2. Buat database di supabase kemudian masukkan ke .env
+   ![image](https://github.com/user-attachments/assets/7642a606-60a2-40ff-a27d-6883918fd5ed)
+   
    ```env
    DB_CONNECTION=pgsql
    DB_HOST=your-supabase-host.supabase.co
