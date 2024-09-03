@@ -44,3 +44,8 @@ Prasyarat:
    DB_USERNAME=your-database-username
    DB_PASSWORD=your-database-password
    ```
+## Memulai sesi
+1. [Membuat model dan migrasi](01.%20Model%20dan%20Migrasi/)
+2. [Factory dan Seeder](02.%20Factory%20dan%20Seeder/)
+3. Membangun Fungsi CRUD
+4. API
