@@ -219,7 +219,7 @@ Menjalankan seeder ini akan mengisi tabel `categories` dengan 100 data acak yang
 ![image](https://github.com/user-attachments/assets/f9a8c753-8267-478e-8320-98229d632f34)
 
 
-## Controller dan Route
+## Controller dan Route Category
 
 Pada bagian ini kita akan membuat controller dan menambahkannya ke route 
 
@@ -329,10 +329,151 @@ Pada bagian ini kita akan membuat controller dan menambahkannya ke route
      ```
    - API akan tersedia di `http://localhost:8000`.
 
-### 6. **Optional: Menambah Middleware untuk Otentikasi**
-   - Jika Anda ingin menambahkan otentikasi, Laravel memiliki paket `sanctum` yang sederhana untuk membuat API dengan token otentikasi.
+## Controller dan Route User
 
+Berikut adalah contoh controller untuk model `User` yang dapat Anda gunakan untuk mengelola pengguna dalam aplikasi Laravel. Controller ini akan memiliki metode CRUD (Create, Read, Update, Delete) dasar yang mirip dengan yang sudah kita buat untuk `Category`.
 
+### 1. **Membuat UserController:**
+
+Untuk membuat `UserController`, Anda bisa menggunakan perintah Artisan berikut:
+
+```bash
+php artisan make:controller UserController --resource
+```
+
+Perintah ini akan membuat `UserController` di dalam direktori `app/Http/Controllers` dengan metode CRUD standar.
+
+### 2. **Implementasi UserController:**
+
+Berikut adalah contoh implementasi dari `UserController` dengan metode CRUD dasar:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    /**
+     * Display a listing of the users.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        // Mendapatkan semua pengguna
+        $users = User::all();
+        return response()->json($users, 200);
+    }
+
+    /**
+     * Store a newly created user in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        // Validasi input
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        // Buat pengguna baru
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => bcrypt($validatedData['password']),
+        ]);
+
+        return response()->json($user, 201);
+    }
+
+    /**
+     * Display the specified user.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $user = User::findOrFail($id);
+        return response()->json($user, 200);
+    }
+
+    /**
+     * Update the specified user in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        // Validasi input
+        $validatedData = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'sometimes|required|string|min:8',
+        ]);
+
+        // Cari pengguna berdasarkan ID
+        $user = User::findOrFail($id);
+
+        // Update data pengguna
+        $user->update($validatedData);
+
+        return response()->json($user, 200);
+    }
+
+    /**
+     * Remove the specified user from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $user = User::findOrFail($id);
+
+        // Hapus pengguna
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully'], 204);
+    }
+}
+```
+
+### 3. **Menambahkan Route untuk UserController:**
+
+Untuk menghubungkan controller dengan rute, tambahkan rute berikut di `routes/api.php`:
+
+```php
+use App\Http\Controllers\UserController;
+
+Route::apiResource('users', UserController::class);
+```
+
+### 4. **Mengakses Endpoint User:**
+
+Setelah rute diatur, Anda bisa mengakses berbagai endpoint untuk mengelola pengguna:
+
+- **GET** `/api/users` - Mendapatkan semua pengguna
+- **POST** `/api/users` - Menambahkan pengguna baru
+- **GET** `/api/users/{id}` - Mendapatkan detail pengguna berdasarkan ID
+- **PUT** `/api/users/{id}` - Memperbarui data pengguna berdasarkan ID
+- **DELETE** `/api/users/{id}` - Menghapus pengguna berdasarkan ID
+
+### Kesimpulan
+
+`UserController` ini menyediakan semua metode CRUD dasar yang Anda butuhkan untuk mengelola pengguna dalam aplikasi Laravel Anda. Dengan menghubungkan controller ini dengan rute yang sesuai, Anda bisa membangun API yang kuat untuk mengelola pengguna.
 
 ## Catatan tambahan
 1. [Membuat model dan migrasi](01.%20Model%20dan%20Migrasi/)
