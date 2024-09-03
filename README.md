@@ -29,6 +29,7 @@ Prasyarat:
 6. Selesai
 
 ## Memulai Project
+
 1. Siapkan direktori kerja kemudian masuk ke CMD pada direktori kerja yang baru dibuat, ketikkan perintah:
    ```sh
    composer create-project --prefer-dist laravel/laravel laracroot
@@ -44,7 +45,31 @@ Prasyarat:
    DB_USERNAME=your-database-username
    DB_PASSWORD=your-database-password
    ```
-## Memulai sesi
+## Buat Migration dan Model
+   - Buat migration dan model untuk resource yang ingin Anda kelola melalui API, misalnya `Post`.
+   - Jalankan perintah:
+     ```bash
+     php artisan make:model Post -m
+     ```
+   - Buka file migration di `database/migrations/` dan tambahkan kolom yang diperlukan, contoh:
+     ```php
+     public function up()
+     {
+         Schema::create('posts', function (Blueprint $table) {
+             $table->id();
+             $table->string('title');
+             $table->text('content');
+             $table->timestamps();
+         });
+     }
+     ```
+   - Jalankan migration untuk membuat tabel di database:
+     ```bash
+     php artisan migrate
+     ```
+
+
+## Catatan tambahan
 1. [Membuat model dan migrasi](01.%20Model%20dan%20Migrasi/)
 2. [Factory dan Seeder](02.%20Factory%20dan%20Seeder/)
 3. Membangun Fungsi CRUD
