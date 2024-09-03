@@ -231,14 +231,47 @@ Pada bagian ini kita akan membuat controller dan menambahkannya ke route
    - Ini akan membuat `CategoryController` dengan metode CRUD (Create, Read, Update, Delete) dasar.
 
 ### 2. **Atur Route API**
-   - Buka file `routes/api.php` dan tambahkan route untuk resource `Post`:
+   - Edit file `bootstrap/app.php` agar mendeklarasikan api.php:
      ```php
-     Route::apiResource('categories', CategoryController::class);
+     <?php
+
+      use Illuminate\Foundation\Application;
+      use Illuminate\Foundation\Configuration\Exceptions;
+      use Illuminate\Foundation\Configuration\Middleware;
+      
+      return Application::configure(basePath: dirname(__DIR__))
+          ->withRouting(
+              web: __DIR__.'/../routes/web.php',
+              api: __DIR__.'/../routes/api.php',//tambahan untuk api
+              commands: __DIR__.'/../routes/console.php',
+              health: '/up',
+              apiPrefix: '/api',//prefix untuk api
+          )
+          ->withMiddleware(function (Middleware $middleware) {
+              //
+          })
+          ->withExceptions(function (Exceptions $exceptions) {
+              //
+          })->create();
+
+     ```
+   - Buka file `routes/api.php` dan tambahkan route untuk resource `Category`:
+     ```php
+     <?php
+
+      use Illuminate\Support\Facades\Route;
+      use App\Http\Controllers\CategoryController;
+      
+      Route::apiResource('categories', CategoryController::class);
+
      ```
    - Route ini secara otomatis akan membuat route untuk GET, POST, PUT, dan DELETE.
 
 ### 3. **Implementasi Metode di Controller**
    - Buka `CategoryController.php` dan implementasikan logika CRUD. Contoh implementasi untuk metode `store` (POST), `index` (GET), dan `update` (PUT):
+   - ```php
+     use App\Models\Category; // Pastikan Anda mengimpor model Category di sini
+     ```
 
      **GET: Mengambil Data**
      ```php
