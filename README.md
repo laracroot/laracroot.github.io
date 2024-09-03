@@ -304,8 +304,8 @@ Pada bagian ini kita akan membuat controller dan menambahkannya ke route
 ### 4. **Test API dengan Postman atau Curl**
    - Gunakan Postman atau Curl untuk mengetes API Anda. Misalnya, untuk membuat data baru:
      - Method: `POST`
-     - URL: `http://localhost:8000/api/posts`
-     - Body: `{"title": "Judul Baru", "content": "Konten baru"}`
+     - URL: `http://127.0.0.1:8000/api/categories`
+     - Body: `{"name":"asep","is_publish":true}`
 
 ### 5. **Jalankan Server**
    - Jalankan server Laravel menggunakan perintah:
