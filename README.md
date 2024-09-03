@@ -300,6 +300,21 @@ Pada bagian ini kita akan membuat controller dan menambahkannya ke route
          return response()->json($post, 200);
      }
      ```
+     
+     **DELETE: Menghapus Data**
+     ```php
+         public function destroy(string $id)
+    {
+        // Cari kategori berdasarkan ID
+        $category = Category::findOrFail($id);
+
+        // Hapus kategori
+        $category->delete();
+
+        // Kembalikan respon JSON yang menunjukkan berhasil
+        return response()->json(['message' => 'Category deleted successfully'], 200);
+    }
+     ```
 
 ### 4. **Test API dengan Postman atau Curl**
    - Gunakan Postman atau Curl untuk mengetes API Anda. Misalnya, untuk membuat data baru:
