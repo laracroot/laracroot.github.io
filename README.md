@@ -23,10 +23,14 @@ Prasyarat:
    @echo off
    php "%~dp0composer.phar" %*
    ```
-5. Install laravel 
-## Instalasi
+5. Selesai
+
+## Memulai Project
+1. Siapkan direktori kerja kemudian masuk ke CMD pada direktori kerja yang baru dibuat, ketikkan perintah:
+   ```sh
+   composer create-project --prefer-dist laravel/laravel laracroot
+   ```
 
 
 
-
-2. 
+3. 
