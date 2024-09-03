@@ -14,6 +14,8 @@ Prasyarat:
    extension=openssl
    extension=zip
    extension=fileinfo
+   extension=pgsql
+   extension=pdo_pgsql
    ```
 4. Install [Composer](https://getcomposer.org/download/)
    ![image](https://github.com/user-attachments/assets/5c59f00b-74ff-4706-8f0a-ae6a6f421d3c)  
