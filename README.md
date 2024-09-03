@@ -33,4 +33,12 @@ Prasyarat:
    ```sh
    composer create-project --prefer-dist laravel/laravel laracroot
    ```
-2. Buat database di supabase kemudian masukkan ke .env 
+2. Buat database di supabase kemudian masukkan ke .env
+   ```env
+   DB_CONNECTION=pgsql
+   DB_HOST=your-supabase-host.supabase.co
+   DB_PORT=5432
+   DB_DATABASE=your-database-name
+   DB_USERNAME=your-database-username
+   DB_PASSWORD=your-database-password
+   ```
