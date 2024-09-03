@@ -31,6 +31,6 @@ Prasyarat:
 ## Memulai Project
 1. Siapkan direktori kerja kemudian masuk ke CMD pada direktori kerja yang baru dibuat, ketikkan perintah:
    ```sh
-   composer create-project --prefer-dist laravel/laravel laracroot --api
+   composer create-project --prefer-dist laravel/laravel laracroot
    ```
 2. Buat database di supabase kemudian masukkan ke .env 
