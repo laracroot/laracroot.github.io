@@ -266,6 +266,7 @@ Pada bagian ini kita akan membuat controller dan menambahkannya ke route
 
      ```
    - Route ini secara otomatis akan membuat route untuk GET, POST, PUT, dan DELETE.
+   - Untuk mengecek route : `php artisan route:list`
 
 ### 3. **Implementasi Metode di Controller**
    - Buka `CategoryController.php` dan implementasikan logika CRUD. Contoh implementasi untuk metode `store` (POST), `index` (GET), dan `update` (PUT):
