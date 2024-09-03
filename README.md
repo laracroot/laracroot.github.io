@@ -219,6 +219,72 @@ Menjalankan seeder ini akan mengisi tabel `categories` dengan 100 data acak yang
 ![image](https://github.com/user-attachments/assets/f9a8c753-8267-478e-8320-98229d632f34)
 
 
+## Controller dan Route
+
+Pada bagian ini kita akan membuat controller dan menambahkannya ke route 
+
+### 1. **Buat Controller**
+   - Buat controller untuk mengelola API:
+     ```bash
+     php artisan make:controller CategoryController --resource
+     ```
+   - Ini akan membuat `CategoryController` dengan metode CRUD (Create, Read, Update, Delete) dasar.
+
+### 2. **Atur Route API**
+   - Buka file `routes/api.php` dan tambahkan route untuk resource `Post`:
+     ```php
+     Route::apiResource('categories', CategoryController::class);
+     ```
+   - Route ini secara otomatis akan membuat route untuk GET, POST, PUT, dan DELETE.
+
+### 3. **Implementasi Metode di Controller**
+   - Buka `CategoryController.php` dan implementasikan logika CRUD. Contoh implementasi untuk metode `store` (POST), `index` (GET), dan `update` (PUT):
+
+     **GET: Mengambil Data**
+     ```php
+     public function index()
+     {
+         return Category::all();
+     }
+     ```
+
+     **POST: Menambahkan Data**
+     ```php
+     public function store(Request $request)
+     {
+         $post = Category::create($request->all());
+         return response()->json($post, 201);
+     }
+     ```
+
+     **PUT: Mengupdate Data**
+     ```php
+     public function update(Request $request, $id)
+     {
+         $post = Category::findOrFail($id);
+         $post->update($request->all());
+         return response()->json($post, 200);
+     }
+     ```
+
+### 4. **Test API dengan Postman atau Curl**
+   - Gunakan Postman atau Curl untuk mengetes API Anda. Misalnya, untuk membuat data baru:
+     - Method: `POST`
+     - URL: `http://localhost:8000/api/posts`
+     - Body: `{"title": "Judul Baru", "content": "Konten baru"}`
+
+### 5. **Jalankan Server**
+   - Jalankan server Laravel menggunakan perintah:
+     ```bash
+     php artisan serve
+     ```
+   - API akan tersedia di `http://localhost:8000`.
+
+### 6. **Optional: Menambah Middleware untuk Otentikasi**
+   - Jika Anda ingin menambahkan otentikasi, Laravel memiliki paket `sanctum` yang sederhana untuk membuat API dengan token otentikasi.
+
+
+
 ## Catatan tambahan
 1. [Membuat model dan migrasi](01.%20Model%20dan%20Migrasi/)
 2. [Factory dan Seeder](02.%20Factory%20dan%20Seeder/)
