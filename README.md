@@ -198,7 +198,7 @@ Untuk menjalankan seeder dan mengisi tabel `categories` dengan 100 data contoh, 
 php artisan db:seed --class=CategorySeeder
 ```
 
-Jika Anda ingin menjalankan semua seeder sekaligus, Anda bisa mengedit file `DatabaseSeeder.php` untuk memanggil `CategorySeeder`:
+Opsional, jika Anda ingin menjalankan semua seeder sekaligus, Anda bisa mengedit file `DatabaseSeeder.php` untuk memanggil `CategorySeeder`:
 
 ```php
 public function run()
@@ -216,6 +216,8 @@ php artisan db:seed
 ### 6. **Menggunakan Database Seeder**
 
 Menjalankan seeder ini akan mengisi tabel `categories` dengan 100 data acak yang dihasilkan oleh Faker, sesuai dengan definisi dalam factory.
+![image](https://github.com/user-attachments/assets/f9a8c753-8267-478e-8320-98229d632f34)
+
 
 ## Catatan tambahan
 1. [Membuat model dan migrasi](01.%20Model%20dan%20Migrasi/)
