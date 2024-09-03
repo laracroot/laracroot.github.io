@@ -46,22 +46,41 @@ Prasyarat:
    DB_PASSWORD=your-database-password
    ```
 ## Buat Migration dan Model
-   - Buat migration dan model untuk resource yang ingin Anda kelola melalui API, misalnya `Post`.
-   - Jalankan perintah:
+   - Buat migration dan model untuk resource yang ingin Anda kelola melalui API, misalnya `Category`. Dengan field: id, name, is_publish (boolean), created_at, dan updated_at
+   - Jalankan perintah dengan opsi membuat file migration(-m) saat model dibuat:
      ```bash
-     php artisan make:model Post -m
+     php artisan make:model Category -m
      ```
    - Buka file migration di `database/migrations/` dan tambahkan kolom yang diperlukan, contoh:
      ```php
-     public function up()
-     {
-         Schema::create('posts', function (Blueprint $table) {
-             $table->id();
-             $table->string('title');
-             $table->text('content');
-             $table->timestamps();
-         });
-     }
+     <?php
+      use Illuminate\Database\Migrations\Migration;
+      use Illuminate\Database\Schema\Blueprint;
+      use Illuminate\Support\Facades\Schema;
+      
+      return new class extends Migration
+      {
+          /**
+           * Run the migrations.
+           */
+          public function up(): void
+          {
+              Schema::create('categories', function (Blueprint $table) {
+                  $table->id();
+                  $table->string('name'); // Kolom name
+                  $table->boolean('is_publish')->default(true); // Kolom is_publish dengan nilai default true
+                  $table->timestamps();//created_at dan updated_at
+              });
+          }
+      
+          /**
+           * Reverse the migrations.
+           */
+          public function down(): void
+          {
+              Schema::dropIfExists('categories');
+          }
+      };
      ```
    - Jalankan migration untuk membuat tabel di database:
      ```bash
