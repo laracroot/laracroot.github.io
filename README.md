@@ -102,7 +102,9 @@ Prasyarat:
      ```bash
      php artisan migrate
      ```
-   Dengan langkah-langkah ini, Anda telah berhasil membuat model Category dan migration yang sesuai. Model ini siap digunakan untuk berinteraksi dengan tabel categories di database.
+   Dengan langkah-langkah ini, Anda telah berhasil membuat model Category dan migration yang sesuai. Model ini siap digunakan untuk berinteraksi dengan tabel categories di database.  
+   ![image](https://github.com/user-attachments/assets/7b11dfca-522a-4d00-821f-2c4aebcd8ab2)
+
 
 ## Mengisi database dengan data dummy
 Berikut adalah langkah-langkah untuk membuat factory dan seeder untuk model `Category` serta memasukkan 100 data menggunakan Faker:
