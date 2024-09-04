@@ -484,7 +484,9 @@ php artisan config:publish cors
 
 Kemudian edit `config/cors.php`
 
-## Pagination
+## Interaksi data Category
+
+### Pagination
 
 Bangun Frontend CSR seperti [contoh](https://github.com/laracroot/example), kemudian pada bagian controller CategoryController.php ubah menjadi:
 ```php
@@ -515,5 +517,44 @@ Bangun Frontend CSR seperti [contoh](https://github.com/laracroot/example), kemu
             'next_page_url' => $categories->nextPageUrl(), // URL halaman berikutnya
         ]);
     }
+```
+
+### Search
+Untuk mendukung search maka kita tinggal tambahkan kondisi jika query search ada di CategoryController.php:
+```php
+public function index(Request $request)
+{
+    $perPage = 10;
+
+    // Ambil nilai pencarian dari query string
+    $search = $request->input('search');
+
+    // Query dasar untuk mendapatkan kategori
+    $query = Category::query();
+
+    // Jika ada nilai pencarian, tambahkan kondisi ke query
+    if ($search) {
+        $query->where('name', 'like', '%' . $search . '%')
+              ->orWhere('id', 'like', '%' . $search . '%')
+              ->orWhere('is_publish', 'like', '%' . $search . '%')
+              ->orWhere('created_at', 'like', '%' . $search . '%')
+              ->orWhere('updated_at', 'like', '%' . $search . '%');
+    }
+
+    // Dapatkan hasil query dengan pagination
+    $categories = $query->paginate($perPage);
+
+    // Kembalikan data ke frontend dalam format JSON
+    return response()->json([
+        'data' => $categories->items(),
+        'current_page' => $categories->currentPage(),
+        'last_page' => $categories->lastPage(),
+        'per_page' => $categories->perPage(),
+        'total' => $categories->total(),
+        'prev_page_url' => $categories->previousPageUrl(),
+        'next_page_url' => $categories->nextPageUrl(),
+    ]);
+}
+
 ```
 
