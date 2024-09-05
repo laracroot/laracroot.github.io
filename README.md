@@ -561,3 +561,199 @@ public function index(Request $request)
 
 ```
 
+## Otorisasi dan Authentikasi dengan PASETO
+
+**PASETO (Platform-Agnostic Security Tokens)** adalah alternatif yang lebih aman daripada JWT (JSON Web Tokens). Laravel 11 dapat mengimplementasikan PASETO V4 (versi asimetris) untuk autentikasi dengan beberapa langkah sederhana.
+
+Berikut adalah panduan langkah demi langkah untuk mengimplementasikan PASETO V4 di Laravel 11:
+
+### 1. **Instal Library PASETO**
+
+Pasang library [paragonie/paseto](https://github.com/paragonie/paseto) menggunakan Composer. Ini adalah implementasi resmi PASETO untuk PHP.
+
+```bash
+composer require paragonie/paseto
+```
+
+### 2. **Buat Kunci Privat dan Publik**
+
+PASETO V4 menggunakan kunci asimetris, jadi Anda memerlukan sepasang kunci: **private** (untuk menandatangani token) dan **public** (untuk memverifikasi token).
+
+Gunakan kode berikut untuk membuat kunci privat dan publik. Anda bisa menyimpannya dalam file `.env` atau di database yang aman.
+
+```php
+use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
+use ParagonIE\Paseto\Protocol\Version4;
+
+// Membuat kunci privat
+$secretKey = AsymmetricSecretKey::generate(new Version4());
+$publicKey = $secretKey->getPublicKey();
+
+// Simpan dalam file .env atau log
+echo "Private Key: " . base64_encode($secretKey->encode()) . PHP_EOL;
+echo "Public Key: " . base64_encode($publicKey->encode()) . PHP_EOL;
+```
+
+Setelah membuat kunci, simpan di `.env` Anda:
+
+```env
+PASETO_PRIVATE_KEY=your_private_key_base64
+PASETO_PUBLIC_KEY=your_public_key_base64
+```
+
+### 3. **Membuat Middleware Autentikasi PASETO**
+
+Middleware digunakan untuk memverifikasi token PASETO setiap kali permintaan datang. Buat middleware baru di Laravel menggunakan perintah artisan:
+
+```bash
+php artisan make:middleware PasetoAuth
+```
+
+#### **Implementasi Middleware:**
+
+Buka file `app/Http/Middleware/PasetoAuth.php` dan tambahkan logika berikut:
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use ParagonIE\Paseto\Protocol\Version4;
+use ParagonIE\Paseto\Parser;
+use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
+use ParagonIE\Paseto\Exception\PasetoException;
+use Symfony\Component\HttpFoundation\Response;
+
+class PasetoAuth
+{
+    public function handle(Request $request, Closure $next)
+    {
+        // Ambil token dari header Authorization (Bearer token)
+        $token = $request->bearerToken();
+        if (!$token) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        try {
+            // Decode public key dari base64
+            $publicKeyData = base64_decode(env('PASETO_PUBLIC_KEY'));
+
+            // Buat kunci publik untuk memverifikasi token
+            $publicKey = new AsymmetricPublicKey($publicKeyData, new Version4());
+
+            // Parser untuk memverifikasi token
+            $parser = (new Parser())
+                ->setPurpose('public') // PASETO V4 adalah token publik
+                ->setKey($publicKey)   // Kunci publik untuk verifikasi
+                ->setAllowedVersions(new Version4());
+
+            // Memverifikasi dan memparse token
+            $parsedToken = $parser->parse($token);
+
+            // Ambil klaim dari token (misalnya user ID)
+            $claims = $parsedToken->getClaims();
+            $userId = $claims['sub']; // 'sub' biasanya menyimpan ID pengguna
+
+            // Lanjutkan request jika token valid
+            $request->attributes->set('userId', $userId); // Simpan user ID di request
+            return $next($request);
+
+        } catch (PasetoException $e) {
+            // Token tidak valid atau gagal diverifikasi
+            return response()->json(['error' => 'Invalid token: ' . $e->getMessage()], Response::HTTP_UNAUTHORIZED);
+        }
+    }
+}
+```
+
+### 4. **Mendaftarkan Middleware**
+
+Daftarkan middleware ini di `app/Http/Kernel.php`:
+
+```php
+protected $routeMiddleware = [
+    // Middleware lainnya
+    'paseto.auth' => \App\Http\Middleware\PasetoAuth::class,
+];
+```
+
+### 5. **Menghasilkan Token PASETO**
+
+Buat metode di controller untuk menghasilkan token PASETO ketika pengguna login atau melakukan autentikasi.
+
+Contoh di controller `AuthController`:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
+use ParagonIE\Paseto\Builder;
+use ParagonIE\Paseto\Protocol\Version4;
+
+class AuthController extends Controller
+{
+    public function login(Request $request)
+    {
+        // Validasi input login (email dan password)
+        $credentials = $request->only('email', 'password');
+
+        if (auth()->attempt($credentials)) {
+            $user = auth()->user();
+
+            // Ambil private key dari .env
+            $privateKeyData = base64_decode(env('PASETO_PRIVATE_KEY'));
+
+            // Buat kunci privat untuk menandatangani token
+            $privateKey = new AsymmetricSecretKey($privateKeyData, new Version4());
+
+            // Buat token PASETO
+            $token = (new Builder())
+                ->setVersion(new Version4())
+                ->setPurpose('public')
+                ->setKey($privateKey)
+                ->setIssuer('your-app-name')
+                ->setAudience('your-app-users')
+                ->setSubject($user->id) // Masukkan ID pengguna sebagai subjek token
+                ->setExpiration(new \DateTimeImmutable('+1 hour'))
+                ->toString();
+
+            // Kembalikan token ke frontend
+            return response()->json(['token' => $token]);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+}
+```
+
+### 6. **Melindungi Route dengan Middleware**
+
+Sekarang Anda dapat melindungi route dengan middleware `paseto.auth`:
+
+```php
+Route::middleware(['paseto.auth'])->group(function () {
+    Route::get('/protected-route', [YourController::class, 'protectedMethod']);
+});
+```
+
+### 7. **Menggunakan Token di Frontend**
+
+Di frontend, kirim token PASETO sebagai Bearer token di header Authorization ketika mengakses route yang dilindungi:
+
+```javascript
+fetch('https://example.com/protected-route', {
+    method: 'GET',
+    headers: {
+        'Authorization': `Bearer ${token}`,
+    }
+});
+```
+
+### Kesimpulan
+
+Dengan langkah-langkah ini, Anda dapat mengimplementasikan autentikasi menggunakan PASETO V4 di Laravel 11. PASETO menawarkan keamanan yang lebih kuat daripada JWT dengan menggunakan enkripsi asimetris untuk menandatangani dan memverifikasi token.
