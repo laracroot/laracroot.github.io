@@ -775,9 +775,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Sekarang Anda dapat melindungi route dengan middleware `paseto.auth`:
 
 ```php
-Route::middleware(['paseto.auth'])->group(function () {
-    Route::get('/protected-route', [YourController::class, 'protectedMethod']);
-});
+use App\Http\Middleware\PasetoAuth;
+
+Route::apiResource('categories', CategoryController::class)->middleware(PasetoAuth::class);
 ```
 
 ### 7. **Menggunakan Token di Frontend**
