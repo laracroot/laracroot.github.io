@@ -585,13 +585,21 @@ Gunakan kode berikut untuk membuat kunci privat dan publik. Anda bisa menyimpann
 use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
 use ParagonIE\Paseto\Protocol\Version4;
 
-// Membuat kunci privat
-$secretKey = AsymmetricSecretKey::generate(new Version4());
-$publicKey = $secretKey->getPublicKey();
+// Membuat pasangan kunci privat-publik menggunakan Sodium (libsodium)
+$privateKey = AsymmetricSecretKey::generate(new Version4()); // Menghasilkan kunci privat untuk V4
+$publicKey = $privateKey->getPublicKey(); // Mengambil kunci publik dari kunci privat
 
-// Simpan dalam file .env atau log
-echo "Private Key: " . base64_encode($secretKey->encode()) . PHP_EOL;
-echo "Public Key: " . base64_encode($publicKey->encode()) . PHP_EOL;
+// Encode kunci untuk penyimpanan (Base64)
+$privateKeyEncoded = $privateKey->encode();
+$publicKeyEncoded = $publicKey->encode();
+
+// Decode kembali kunci privat dan publik dari string yang di-encode
+$privateKeyDecoded = AsymmetricSecretKey::fromEncodedString($privateKeyEncoded);
+$publicKeyDecoded = $publicKey::fromEncodedString($publicKeyEncoded);
+
+// Tampilkan kunci (untuk tujuan debugging)
+echo "Private Key (Encoded): " . $privateKeyEncoded . PHP_EOL;
+echo "Public Key (Encoded): " . $publicKeyEncoded . PHP_EOL;
 ```
 
 Setelah membuat kunci, simpan di `.env` Anda:
@@ -620,15 +628,23 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+
 use ParagonIE\Paseto\Protocol\Version4;
 use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
 use ParagonIE\Paseto\Exception\PasetoException;
+use ParagonIE\Paseto\Purpose;
+
 use Symfony\Component\HttpFoundation\Response;
 
 class PasetoAuth
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
     {
         // Ambil token dari header Authorization (Bearer token)
         $token = $request->bearerToken();
@@ -637,15 +653,18 @@ class PasetoAuth
         }
 
         try {
-            // Decode public key dari base64
-            $publicKeyData = base64_decode(env('PASETO_PUBLIC_KEY'));
+            // Ambil kunci publik yang di-encode dari .env
+            $publicKeyEncoded = env('PASETO_PUBLIC_KEY');
+            if (!$publicKeyEncoded) {
+                return response()->json(['error' => 'Public key not found'], 500);
+            }
 
-            // Buat kunci publik untuk memverifikasi token
-            $publicKey = new AsymmetricPublicKey($publicKeyData, new Version4());
+            // Decode kunci publik
+            $publicKey = AsymmetricPublicKey::fromEncodedString($publicKeyEncoded);
 
             // Parser untuk memverifikasi token
             $parser = (new Parser())
-                ->setPurpose('public') // PASETO V4 adalah token publik
+                ->setPurpose(Purpose::public()) // PASETO V4 adalah token publik
                 ->setKey($publicKey)   // Kunci publik untuk verifikasi
                 ->setAllowedVersions(new Version4());
 
@@ -666,6 +685,7 @@ class PasetoAuth
         }
     }
 }
+
 ```
 
 ### 4. **Mendaftarkan Middleware**
@@ -694,9 +714,10 @@ Buat metode di controller untuk menghasilkan token PASETO ketika pengguna login 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
 use ParagonIE\Paseto\Builder;
+use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
 use ParagonIE\Paseto\Protocol\Version4;
+use ParagonIE\Paseto\Purpose;
 
 class AuthController extends Controller
 {
@@ -708,30 +729,45 @@ class AuthController extends Controller
         if (auth()->attempt($credentials)) {
             $user = auth()->user();
 
-            // Ambil private key dari .env
-            $privateKeyData = base64_decode(env('PASETO_PRIVATE_KEY'));
+            // Ambil kunci privat dari .env dan decode
+            $privateKeyEncoded = env('PASETO_PRIVATE_KEY');
+            if (!$privateKeyEncoded) {
+                return response()->json(['error' => 'Private key not found'], 500);
+            }
 
-            // Buat kunci privat untuk menandatangani token
-            $privateKey = new AsymmetricSecretKey($privateKeyData, new Version4());
+            try {
+                // Decode kunci privat
+                $privateKey = AsymmetricSecretKey::fromEncodedString($privateKeyEncoded);
 
-            // Buat token PASETO
-            $token = (new Builder())
-                ->setVersion(new Version4())
-                ->setPurpose('public')
-                ->setKey($privateKey)
-                ->setIssuer('your-app-name')
-                ->setAudience('your-app-users')
-                ->setSubject($user->id) // Masukkan ID pengguna sebagai subjek token
-                ->setExpiration(new \DateTimeImmutable('+1 hour'))
-                ->toString();
+                // Buat token PASETO
+                $token = (new Builder())
+                    ->setVersion(new Version4())  // Gunakan PASETO V4
+                    ->setPurpose(Purpose::public())  // Token publik
+                    ->setKey($privateKey)  // Kunci privat untuk menandatangani token
+                    ->setIssuer('your-app-name')  // Issuer aplikasi Anda
+                    ->setAudience('your-app-users')  // Audience pengguna aplikasi
+                    ->setSubject($user->id)  // Subjek token adalah ID pengguna
+                    ->setExpiration(new \DateTimeImmutable('+1 hour'))  // Token berlaku selama 1 jam
+                    ->toString();
 
-            // Kembalikan token ke frontend
-            return response()->json(['token' => $token]);
+                // Kembalikan token ke frontend
+                return response()->json(['token' => $token]);
+
+            } catch (\Exception $e) {
+                // Jika gagal menandatangani token
+                return response()->json(['error' => 'Signing failed: ' . $e->getMessage()], 500);
+            }
         }
 
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 }
+```
+Tambahkan di routes/api.php
+```php
+use App\Http\Controllers\AuthController;
+
+Route::post('/login', [AuthController::class, 'login']);
 ```
 
 ### 6. **Melindungi Route dengan Middleware**
