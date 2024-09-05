@@ -682,9 +682,11 @@ use App\Http\Middleware\PasetoAuth;
 
 ### 5. **Menghasilkan Token PASETO**
 
+Buat Controller Baru bernama AuthController
+```sh
+php artisan make:controller AuthController
+```
 Buat metode di controller untuk menghasilkan token PASETO ketika pengguna login atau melakukan autentikasi.
-
-Contoh di controller `AuthController`:
 
 ```php
 <?php
