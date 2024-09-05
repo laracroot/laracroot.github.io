@@ -634,6 +634,7 @@ use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
 use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Purpose;
+use ParagonIE\Paseto\ProtocolCollection;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -662,11 +663,14 @@ class PasetoAuth
             // Decode kunci publik
             $publicKey = AsymmetricPublicKey::fromEncodedString($publicKeyEncoded);
 
+            // Buat koleksi protokol untuk memungkinkan hanya PASETO V4
+            $protocols = ProtocolCollection::v4();
+
             // Parser untuk memverifikasi token
             $parser = (new Parser())
                 ->setPurpose(Purpose::public()) // PASETO V4 adalah token publik
                 ->setKey($publicKey)   // Kunci publik untuk verifikasi
-                ->setAllowedVersions(new Version4());
+                ->setAllowedVersions($protocols);
 
             // Memverifikasi dan memparse token
             $parsedToken = $parser->parse($token);
@@ -685,6 +689,7 @@ class PasetoAuth
         }
     }
 }
+
 
 ```
 
