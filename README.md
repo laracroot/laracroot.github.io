@@ -670,13 +670,14 @@ class PasetoAuth
 
 ### 4. **Mendaftarkan Middleware**
 
-Daftarkan middleware ini di `app/Http/Kernel.php`:
+Daftarkan middleware ini di `bootstrap/app.php`:
 
 ```php
-protected $routeMiddleware = [
-    // Middleware lainnya
-    'paseto.auth' => \App\Http\Middleware\PasetoAuth::class,
-];
+use App\Http\Middleware\PasetoAuth;
+ 
+->withMiddleware(function (Middleware $middleware) {
+     $middleware->append(PasetoAuth::class);
+})
 ```
 
 ### 5. **Menghasilkan Token PASETO**
