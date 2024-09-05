@@ -486,6 +486,8 @@ Kemudian edit `config/cors.php`
 
 ## Interaksi data Category
 
+Contoh kode bisa dilihat di bagian [example](https://github.com/laracroot/example)
+
 ### Pagination
 
 Bangun Frontend CSR seperti [contoh](https://github.com/laracroot/example), kemudian pada bagian controller CategoryController.php ubah menjadi:
