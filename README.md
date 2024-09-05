@@ -689,8 +689,6 @@ class PasetoAuth
         }
     }
 }
-
-
 ```
 
 ### 4. **Mendaftarkan Middleware**
@@ -796,6 +794,29 @@ fetch('https://example.com/protected-route', {
         'Authorization': `Bearer ${token}`,
     }
 });
+```
+### 8. **Mengambil user id dari controller**
+
+untuk mengambil user id dari controller maka kita tinggal memanggil request:
+```php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ProtectedController extends Controller
+{
+    public function showProtectedData(Request $request)
+    {
+        // Ambil user ID dari atribut request
+        $userId = $request->get('userId');
+
+        // Gunakan user ID sesuai kebutuhan, misalnya untuk mengakses data pengguna
+        return response()->json([
+            'message' => 'Protected data accessed',
+            'userId' => $userId
+        ]);
+    }
+}
 ```
 
 ### Kesimpulan
