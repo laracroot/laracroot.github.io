@@ -818,6 +818,60 @@ class ProtectedController extends Controller
     }
 }
 ```
+### 8. **Setup Deployment CI/CD**
+
+Kita akan mencoba melakukan deployment ke alwaysdata.com. Pertama kita setup dulu github action nya yang berada di folder .github/workflows. Lalu buat file alwaysdata.yml
+
+```yaml
+name: AlwaysData.com Deployment
+on:
+  push:
+    branches:
+      - main
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.server }}
+        username: ${{ secrets.username }}
+        password: ${{ secrets.password }}
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/*.go*
+          *.go
+          **/*.git*/**
+
+    - name: Check binary file, ipaddress, and restart sites
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.sshhost }}
+        username: ${{ secrets.sshusername }}
+        password: ${{ secrets.sshpassword }}
+        port: ${{ secrets.sshport }}
+        script: |
+          php -v
+          curl -sS https://getcomposer.org/installer | php
+          php composer.phar install --no-dev --optimize-autoloader
+          php artisan route:clear
+          php artisan config:clear
+          php artisan cache:clear
+          curl https://icanhazip.com/
+          curl -X POST --basic --user "${{ secrets.apikey }}:" https://api.alwaysdata.com/v1/site/${{ secrets.appid }}/restart/
+```
+dan setting repository secrets nya seperti ini:  
+![image](https://github.com/user-attachments/assets/51702e04-89ba-4e17-b6ec-a693243fd010)  
+dan masukan isi .env kedalam setting aplikasi di dashboard alwaysdata  
+![image](https://github.com/user-attachments/assets/11370cf0-19d6-461b-9e9a-c6378ca01aba)
+
+contoh lengkapnya [disini](https://github.com/laracroot/larabackend)
 
 ### Kesimpulan
 
